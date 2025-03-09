@@ -62,30 +62,83 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
       body: _currentCat == null
           ? Center(child: CircularProgressIndicator())
           : Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.network(_currentCat!['url']),
-            if (_currentCat!['breeds'] != null && _currentCat!['breeds'].isNotEmpty)
-              Text(_currentCat!['breeds'][0]['name'])
-            else
-              Text('Unknown Breed'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.thumb_down),
-                  onPressed: () => _fetchNewCat(),
+        child: Card(
+          elevation: 5,
+          margin: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () => _showDetailsModal(context, _currentCat!),
+                child: Image.network(
+                  _currentCat!['url'],
+                  fit: BoxFit.cover,
+                  height: 300,
+                  width: double.infinity,
                 ),
-                IconButton(
-                  icon: Icon(Icons.thumb_up),
-                  onPressed: () => _fetchNewCat(),
+              ),
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  _currentCat!['breeds'][0]['name'],
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ],
-            ),
-          ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.thumb_down, color: Colors.red),
+                    onPressed: () => _fetchNewCat(),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.thumb_up, color: Colors.green),
+                    onPressed: () => _fetchNewCat(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+
+  void _showDetailsModal(BuildContext context, Map<String, dynamic> cat) {
+    final breed = cat['breeds'][0];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                breed['name'],
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 16),
+              Image.network(cat['url'], fit: BoxFit.cover),
+              SizedBox(height: 16),
+              Text(
+                'Description: ${breed['description']}',
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
     );
   }
 }
