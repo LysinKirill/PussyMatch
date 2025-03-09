@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'services/cat_api.dart';
 
-
 void main() async {
   await dotenv.load(fileName: ".env");
   runApp(MyApp());
@@ -28,28 +27,55 @@ class CatTinderScreen extends StatefulWidget {
 
 class _CatTinderScreenState extends State<CatTinderScreen> {
   late final CatApi _catApi;
+  final List<Map<String, dynamic>> _catQueue = []; // Queue of preloaded cats
+  Map<String, dynamic>? _currentCat;
 
   @override
   void initState() {
     super.initState();
-    final apiKey = dotenv.env['CAT_API_KEY'] ?? ''; // Get API key from .env
+    final apiKey = dotenv.env['CAT_API_KEY'] ?? '';
     _catApi = CatApi(apiKey);
-    _fetchNewCat();
+    _preloadCats(); // Preload 5 cats when the app starts
   }
 
-  Map<String, dynamic>? _currentCat;
+  // Preload 5 cats into the queue
+  Future<void> _preloadCats() async {
+    for (int i = 0; i < 5; i++) {
+      await _fetchNewCat();
+    }
+    _showNextCat(); // Show the first cat
+  }
 
+  // Fetch a new cat and add it to the queue
   Future<void> _fetchNewCat() async {
     try {
       final cat = await _catApi.fetchRandomCat();
       setState(() {
-        _currentCat = cat;
+        _catQueue.add(cat); // Add the new cat to the queue
       });
+      // Preload the image into memory
+      final imageUrl = cat['url'];
+      final imageProvider = NetworkImage(imageUrl);
+      await precacheImage(imageProvider, context);
     } catch (e) {
       print('Error fetching cat: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load a new cat. Please try again.')),
       );
+    }
+  }
+
+  // Show the next cat from the queue
+  void _showNextCat() {
+    if (_catQueue.isNotEmpty) {
+      setState(() {
+        _currentCat = _catQueue.removeAt(0); // Remove the first cat from the queue
+      });
+      _fetchNewCat(); // Fetch a new cat to keep the queue full
+    } else {
+      setState(() {
+        _currentCat = null; // No cats left in the queue
+      });
     }
   }
 
@@ -92,11 +118,11 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.thumb_down, color: Colors.red),
-                    onPressed: () => _fetchNewCat(),
+                    onPressed: () => _showNextCat(),
                   ),
                   IconButton(
                     icon: Icon(Icons.thumb_up, color: Colors.green),
-                    onPressed: () => _fetchNewCat(),
+                    onPressed: () => _showNextCat(),
                   ),
                 ],
               ),
@@ -106,7 +132,6 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
       ),
     );
   }
-
 
   void _showDetailsModal(BuildContext context, Map<String, dynamic> cat) {
     final breed = cat['breeds'][0];

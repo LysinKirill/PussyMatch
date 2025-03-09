@@ -15,7 +15,6 @@ class CatApi {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print(data); // Log the API response
       if (data.isNotEmpty && data[0]['breeds'] != null && data[0]['breeds'].isNotEmpty) {
         return data[0];
       } else {
