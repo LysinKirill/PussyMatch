@@ -58,7 +58,7 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
       final imageProvider = NetworkImage(cat['url']);
       await precacheImage(imageProvider, context);
 
-      if (_catQueue.length < preloadCatsCount) {
+      if (_catQueue.length < bufferSize) {
         _fetchNewCat();
       }
     } catch (e) {
@@ -241,7 +241,7 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
         }
       });
       // Trigger new fetch if queue gets low
-      if (_catQueue.length < preloadCatsCount) {
+      if (_catQueue.length < bufferSize) {
         _fetchNewCat();
       }
     }
