@@ -132,10 +132,15 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
               onTap: () => _showDetailsModal(context, cat),
               child: ClipRRect(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                child: Image.network(
-                  cat['url'],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
+                child:
+                GestureDetector(
+                  onTap: () => _showDetailsModal(context, cat),
+                  child: Image.network(
+                    cat['url'],
+                    fit: BoxFit.cover,
+                    height: 300,
+                    width: double.infinity,
+                  ),
                 ),
               ),
             ),
@@ -233,6 +238,119 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
   }
 
   void _showDetailsModal(BuildContext context, Map<String, dynamic> cat) {
-    // Your existing modal code
+    final breed = cat['breeds'][0];
+    final mediaQuery = MediaQuery.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          margin: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: mediaQuery.viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.topRight,
+                child: IconButton(
+                  icon: Icon(Icons.close, color: Colors.grey[700]),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              Text(
+                breed['name'],
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[800],
+                ),
+              ),
+              SizedBox(height: 16),
+              // Cat Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  cat['url'],
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 200,
+                ),
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildDetailCard('Description', breed['description']),
+                      _buildDetailCard('Temperament', breed['temperament']),
+                      _buildDetailCard('Origin', breed['origin']),
+                      _buildDetailCard('Life Span', '${breed['life_span']} years'),
+                      _buildDetailCard('Weight', '${breed['weight']['metric']} kg'),
+                      _buildDetailCard('Adaptability', '${breed['adaptability']}/5'),
+                      _buildDetailCard('Affection Level', '${breed['affection_level']}/5'),
+                      _buildDetailCard('Child Friendly', '${breed['child_friendly']}/5'),
+                      _buildDetailCard('Dog Friendly', '${breed['dog_friendly']}/5'),
+                      _buildDetailCard('Energy Level', '${breed['energy_level']}/5'),
+                      _buildDetailCard('Health Issues', '${breed['health_issues']}/5'),
+                      _buildDetailCard('Intelligence', '${breed['intelligence']}/5'),
+                      _buildDetailCard('Social Needs', '${breed['social_needs']}/5'),
+                      _buildDetailCard('Stranger Friendly', '${breed['stranger_friendly']}/5'),
+                      _buildDetailCard('Vocalisation', '${breed['vocalisation']}/5'),
+                      _buildDetailCard('Wikipedia', breed['wikipedia_url']),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailCard(String label, String value) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
