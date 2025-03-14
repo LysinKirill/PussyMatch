@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'services/cat_api.dart';
 
 void main() async {
@@ -72,7 +73,28 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PussyMatch'),
+        title: Container(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white, // Title background color
+            borderRadius: BorderRadius.circular(20), // Rounded corners
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Text(
+            'PussyMatch',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[800], // Title text color
+            ),
+          ),
+        ),
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 20, left: 20),
@@ -278,15 +300,18 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
               ),
               SizedBox(height: 16),
               // Cat Image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  cat['url'],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 200,
-                ),
-              ),
+              AspectRatio(aspectRatio: 1,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      cat['url'],
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 200,
+                    ),
+                  )
+              )
+              ,
               SizedBox(height: 20),
               Expanded(
                 child: SingleChildScrollView(
@@ -308,7 +333,27 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
                       _buildDetailCard('Social Needs', '${breed['social_needs']}/5'),
                       _buildDetailCard('Stranger Friendly', '${breed['stranger_friendly']}/5'),
                       _buildDetailCard('Vocalisation', '${breed['vocalisation']}/5'),
-                      _buildDetailCard('Wikipedia', breed['wikipedia_url']),
+                      ElevatedButton(
+                        onPressed: () {
+                          if (breed['wikipedia_url'] != null) {
+                            launchUrl(Uri.parse(breed['wikipedia_url']));
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[800],
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Open Wikipedia',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
