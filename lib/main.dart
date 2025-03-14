@@ -25,15 +25,12 @@ class CatTinderScreen extends StatefulWidget {
 }
 
 class _CatTinderScreenState extends State<CatTinderScreen> {
-  static const int bufferSize = 10; // Fixed buffer size
-  int _currentIndex = 0; // Tracks current position in buffer
-  List<Map<String, dynamic>?> _catBuffer = List.filled(bufferSize, null); // Fixed-size buffer
-
+  static const int bufferSize = 10;
+  int _currentIndex = 0;
   int _likedCount = 0;
   late final CatApi _catApi;
   final List<Map<String, dynamic>> _catQueue = [];
-  final CardSwiperController _controller = CardSwiperController();
-  double _swipeProgress = 0.0;
+  late final CardSwiperController _controller;
 
   @override
   void initState() {
@@ -41,12 +38,12 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
     final apiKey = dotenv.env['CAT_API_KEY'] ?? '';
     _catApi = CatApi(apiKey);
     _preloadCats();
+    _controller =  CardSwiperController();
   }
 
   Future<void> _preloadCats() async {
-    // Fill all buffer slots with cats
     for (int i = 0; i < bufferSize; i++) {
-      await _fetchNewCat();
+      _fetchNewCat();
     }
   }
   
@@ -54,13 +51,15 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
   Future<void> _fetchNewCat() async {
     try {
       final cat = await _catApi.fetchRandomCat();
-      setState(() => _catQueue.add(cat));
+      if(_catQueue.length < bufferSize) {
+        setState(() => _catQueue.add(cat));
+      }
+      else {
+        setState(() => _catQueue[_currentIndex] = cat);
+        _currentIndex = (_currentIndex + 1) % bufferSize;
+      }
       final imageProvider = NetworkImage(cat['url']);
       await precacheImage(imageProvider, context);
-
-      if (_catQueue.length < bufferSize) {
-        _fetchNewCat();
-      }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -85,19 +84,24 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
           ? Center(child: CircularProgressIndicator())
           : Column(
         children: [
-          Flexible(
-            child: Stack(
-              children: [
-                CardSwiper(
-                  controller: _controller,
-                  cardsCount: _catQueue.length,
-                  cardBuilder: (context, index, percentThresholdX, percentThresholdY) => _buildCard(context, index, percentThresholdX, percentThresholdY),
-                  onSwipe: _onSwipe,
-                  onUndo: _onUndo,
-                  //onUpdate: _onUpdate,
+          Expanded(
+            child: Center(
+              child: AspectRatio(
+                aspectRatio: 0.8,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CardSwiper(
+                      controller: _controller,
+                      cardsCount: _catQueue.length,
+                      cardBuilder: (context, index, percentThresholdX, percentThresholdY) =>
+                          _buildCard(context, index, percentThresholdX, percentThresholdY),
+                      onSwipe: _onSwipe,
+                      onUndo: _onUndo,
+                    )
+                  ],
                 ),
-                _buildSwipeFeedback(),
-              ],
+              ),
             ),
           ),
           _buildActionButtons(),
@@ -116,47 +120,39 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
     return Card(
       elevation: 5,
       margin: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          GestureDetector(
-            onTap: () => _showDetailsModal(context, cat),
-            child: Image.network(
-              cat['url'],
-              fit: BoxFit.cover,
-              height: 300,
-              width: double.infinity,
+          AspectRatio(
+            aspectRatio: 1,
+            child: GestureDetector(
+              onTap: () => _showDetailsModal(context, cat),
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                child: Image.network(
+                  cat['url'],
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
+              ),
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: Text(
               cat['breeds'][0]['name'],
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueGrey[800],
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSwipeFeedback() {
-    if (_swipeProgress == 0) return SizedBox.shrink();
-
-    return Positioned.fill(
-      child: Align(
-        alignment: Alignment.center,
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              colors: [
-                _swipeProgress > 0
-                    ? Colors.green.withOpacity(_swipeProgress.abs() * 0.5)
-                    : Colors.red.withOpacity(_swipeProgress.abs() * 0.5),
-                Colors.transparent,
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -216,7 +212,6 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
       int? currentIndex,
       CardSwiperDirection direction,
       ) {
-    setState(() => _swipeProgress = 0);
     _handleSwipe(direction);
     return true;
   }
@@ -225,25 +220,15 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
     return true;
   }
 
-  void _onUpdate(double progress, CardSwiperDirection direction) {
-    setState(() => _swipeProgress = progress);
-  }
-
   void _handleSwipe(CardSwiperDirection direction) {
     if (_catQueue.isNotEmpty) {
       setState(() {
-        // Remove swiped cat
-        _catQueue.removeAt(0);
-
-        // Update liked count
         if (direction == CardSwiperDirection.right) {
           _likedCount++;
         }
       });
-      // Trigger new fetch if queue gets low
-      if (_catQueue.length < bufferSize) {
-        _fetchNewCat();
-      }
+
+      _fetchNewCat();
     }
   }
 
