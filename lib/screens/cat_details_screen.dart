@@ -19,7 +19,6 @@ class CatDetailScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Cat Image
               AspectRatio(
                 aspectRatio: 1,
                 child: ClipRRect(
@@ -33,23 +32,47 @@ class CatDetailScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               _buildDetailCard('Description', breed.description),
+              const SizedBox(height: 16),
               _buildDetailCard('Temperament', breed.temperament),
-              _buildDetailCard('Origin', breed.origin),
-              _buildDetailCard('Life Span', '${breed.lifeSpan} years'),
-              _buildDetailCard('Weight', '${breed.weight['metric']} kg'),
-              _buildDetailCard('Adaptability', '${breed.adaptability}/5'),
-              _buildDetailCard('Affection Level', '${breed.affectionLevel}/5'),
-              _buildDetailCard('Child Friendly', '${breed.childFriendly}/5'),
-              _buildDetailCard('Dog Friendly', '${breed.dogFriendly}/5'),
-              _buildDetailCard('Energy Level', '${breed.energyLevel}/5'),
-              _buildDetailCard('Health Issues', '${breed.healthIssues}/5'),
-              _buildDetailCard('Intelligence', '${breed.intelligence}/5'),
-              _buildDetailCard('Social Needs', '${breed.socialNeeds}/5'),
-              _buildDetailCard(
-                'Stranger Friendly',
-                '${breed.strangerFriendly}/5',
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildDetailCard(
+                      'Life Span',
+                      '${breed.lifeSpan} years',
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildDetailCard(
+                      'Weight',
+                      '${breed.weight['metric']} kg',
+                    ),
+                  ),
+                ],
               ),
-              _buildDetailCard('Vocalisation', '${breed.vocalisation}/5'),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _buildCategoryTag('Adaptability', breed.adaptability),
+                  _buildCategoryTag('Affection Level', breed.affectionLevel),
+                  _buildCategoryTag('Child Friendly', breed.childFriendly),
+                  _buildCategoryTag('Dog Friendly', breed.dogFriendly),
+                  _buildCategoryTag('Energy Level', breed.energyLevel),
+                  _buildCategoryTag('Health Issues', breed.healthIssues),
+                  _buildCategoryTag('Intelligence', breed.intelligence),
+                  _buildCategoryTag('Social Needs', breed.socialNeeds),
+                  _buildCategoryTag(
+                    'Stranger Friendly',
+                    breed.strangerFriendly,
+                  ),
+                  _buildCategoryTag('Vocalisation', breed.vocalisation),
+                ],
+              ),
+              const SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
                   onPressed: () {
@@ -85,10 +108,11 @@ class CatDetailScreen extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
+      child: Container(
+        width: double.infinity,
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               label,
@@ -102,10 +126,173 @@ class CatDetailScreen extends StatelessWidget {
             Text(
               value,
               style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildCategoryTag(String category, int score) {
+    final tag = _getTagForCategory(category, score);
+    if (category == "Health Issues") {
+      score = 6 - score;
+    }
+
+    final color = _getColorForScore(score);
+    final textColor =
+        (score == 3)
+            ? const Color(0xFF8D6E63)
+            : _getTextColorForScore(score);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: textColor.withValues(alpha: 0.15),
+          width: 1.5,
+        ),
+        gradient: LinearGradient(
+          colors: [
+            color.withValues(alpha: 1),
+            color.withValues(alpha: 0),
+          ],
+          begin: Alignment.center,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: Text(
+        tag,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: textColor,
+        ),
+      ),
+    );
+  }
+
+  String _getTagForCategory(String category, int score) {
+    switch (category) {
+      case 'Adaptability':
+        return [
+          'Struggles to Adapt',
+          'Needs Help Adapting',
+          'Adaptable',
+          'Flexible in Changes',
+          'Highly Adaptable',
+        ][score - 1];
+      case 'Affection Level':
+        return [
+          'Aloof and Distant',
+          'Reserved Affection',
+          'Affectionate',
+          'Loving and Warm',
+          'Very Loving',
+        ][score - 1];
+      case 'Child Friendly':
+        return [
+          'Not Kid-Friendly',
+          'Cautious with Kids',
+          'Tolerant with Kids',
+          'Kid-Friendly',
+          'Very Kid-Friendly',
+        ][score - 1];
+      case 'Dog Friendly':
+        return [
+          'Not Dog-Friendly',
+          'Wary of Dogs',
+          'Tolerant with Dogs',
+          'Dog-Friendly',
+          'Very Dog-Friendly',
+        ][score - 1];
+      case 'Energy Level':
+        return [
+          'Lazy and Calm',
+          'Low Energy',
+          'Moderate Energy',
+          'Energetic',
+          'Very Energetic',
+        ][score - 1];
+      case 'Health Issues':
+        return [
+          'Very Healthy',
+          'Generally Healthy',
+          'Moderate Health Issues',
+          'Prone to Health Issues',
+          'High Maintenance Health',
+        ][score - 1];
+      case 'Intelligence':
+        return [
+          'Slow Learner',
+          'Average Intelligence',
+          'Smart',
+          'Very Smart',
+          'Highly Intelligent',
+        ][score - 1];
+      case 'Social Needs':
+        return [
+          'Independent',
+          'Low Social Needs',
+          'Moderate Social Needs',
+          'Social and Friendly',
+          'Very Social',
+        ][score - 1];
+      case 'Stranger Friendly':
+        return [
+          'Shy with Strangers',
+          'Reserved with Strangers',
+          'Friendly with Strangers',
+          'Very Friendly with Strangers',
+          'Extroverted with Strangers',
+        ][score - 1];
+      case 'Vocalisation':
+        return [
+          'Quiet',
+          'Rarely Vocal',
+          'Moderately Vocal',
+          'Talkative',
+          'Very Vocal',
+        ][score - 1];
+      default:
+        return '';
+    }
+  }
+
+  Color _getColorForScore(int score) {
+    switch (score) {
+      case 1:
+        return const Color(0xFFFFCDD2);
+      case 2:
+        return const Color(0xFFFFE0B2);
+      case 3:
+        return const Color(0xFFFFF9C4);
+      case 4:
+        return const Color(0xFFC8E6C9);
+      case 5:
+        return const Color(0xFFB2DFDB);
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Color _getTextColorForScore(int score) {
+    switch (score) {
+      case 1:
+        return const Color(0xFFC62828);
+      case 2:
+        return const Color(0xFFEF6C00);
+      case 3:
+        return const Color(0xFFF9A825);
+      case 4:
+        return const Color(0xFF2E7D32);
+      case 5:
+        return const Color(0xFF00695C);
+      default:
+        return Colors.black;
+    }
   }
 }
