@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/cat_model.dart';
-import '../widgets/detail_modal.dart';
+import '../screens/cat_details_screen.dart'; // Import the new detail screen
 
 class LikedCatsScreen extends StatefulWidget {
   final List<Cat> likedCats;
@@ -22,7 +22,9 @@ class LikedCatsScreenState extends State<LikedCatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Liked Cats')),
+      appBar: AppBar(
+        title: const Text('Liked Cats'),
+      ),
       body: AnimatedList(
         key: _listKey,
         initialItemCount: widget.likedCats.length,
@@ -38,37 +40,44 @@ class LikedCatsScreenState extends State<LikedCatsScreen> {
     return SizeTransition(
       sizeFactor: animation,
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         child: Card(
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           child: ListTile(
-            contentPadding: EdgeInsets.all(16),
+            contentPadding: const EdgeInsets.all(16),
             leading: AspectRatio(
               aspectRatio: 1,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(cat.url, fit: BoxFit.cover),
+                child: Image.network(
+                  cat.url,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             title: Text(
               cat.breed.name,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             trailing: IconButton(
-              icon: Icon(Icons.delete, color: Colors.red),
+              icon: const Icon(Icons.delete, color: Colors.red),
               onPressed: () {
                 _removeCat(index);
               },
             ),
             onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => DetailModal(cat: cat),
+              // Navigate to the CatDetailScreen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CatDetailScreen(cat: cat),
+                ),
               );
             },
           ),
@@ -82,7 +91,7 @@ class LikedCatsScreenState extends State<LikedCatsScreen> {
     widget.onRemoveCat(removedCat);
     _listKey.currentState!.removeItem(
       index,
-      (context, animation) => _buildListItem(removedCat, animation, index),
+          (context, animation) => _buildListItem(removedCat, animation, index),
     );
   }
 }

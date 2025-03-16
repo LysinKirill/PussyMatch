@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:pussy_match/screens/cat_details_screen.dart';
 import '../models/cat_model.dart';
 import '../services/cat_api.dart';
 import '../widgets/cat_card.dart';
 import '../widgets/action_buttons.dart';
 import '../widgets/heart_counter.dart';
-import '../widgets/detail_modal.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'liked_cats_screen.dart';
 
@@ -173,11 +173,11 @@ class CatTinderScreenState extends State<CatTinderScreen> {
   }
 
   void _showDetailsModal(BuildContext context, Cat cat) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => DetailModal(cat: cat),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CatDetailScreen(cat: cat),
+      )
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/cat_model.dart';
+import '../screens/cat_details_screen.dart';
 
 class CatCard extends StatelessWidget {
   final Cat cat;
@@ -11,17 +12,28 @@ class CatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 5,
-      margin: EdgeInsets.all(16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      margin: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           AspectRatio(
             aspectRatio: 1,
             child: GestureDetector(
-              onTap: onTap,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CatDetailScreen(cat: cat),
+                  ),
+                );
+              },
               child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(15),
+                ),
                 child: Image.network(
                   cat.url,
                   fit: BoxFit.cover,
@@ -32,7 +44,7 @@ class CatCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             child: Text(
               cat.breed.name,
               style: TextStyle(
