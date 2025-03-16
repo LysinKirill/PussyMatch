@@ -9,9 +9,33 @@ PussyMatch is a Tinder-like application for finding the perfect cat breed for yo
 - Custom app icons for a polished look.
 
 ## Screenshots 📸
-![Main Screen](screenshots/main_screen.png)
-![Liked Cats Screen](screenshots/liked_cats_screen.png)
-![Detail Screen](screenshots/detail_screen.png)
+### Main screen
+![Main Screen](screenshots/main_page.jpg)
+
+---
+### Details page
+![Main Screen](screenshots/detailed_description_page.jpg)
+
+
+<div style="text-align: center;"><h3>Swipe mechanic demonstration </h3></div>
+
+- #### Mid swipe
+![Mid Swipe](screenshots/mid-swipe.jpg)
+
+- #### After swipe (the counter has increased)
+![After Swipe](screenshots/after_swipe.jpg)
+
+---
+
+### Liked cat profiles screen
+![Liked Cats Screen](screenshots/liked_profiles_page.jpg)
+
+---
+
+### Custom app icon
+![Custom App Icon](screenshots/priemlemo_icon.jpg)
+
+---
 
 ## Download APK 📥
 [Download the latest APK here](https://github.com/LysinKirill/PussyMatch/releases/download/v0.6.9/app-release.apk)
