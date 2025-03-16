@@ -141,10 +141,7 @@ class CatDetailScreen extends StatelessWidget {
     }
 
     final color = _getColorForScore(score);
-    final textColor =
-        (score == 3)
-            ? const Color(0xFF8D6E63)
-            : _getTextColorForScore(score);
+    final textColor = _getTextColorForScore(score);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -156,10 +153,7 @@ class CatDetailScreen extends StatelessWidget {
           width: 1.5,
         ),
         gradient: LinearGradient(
-          colors: [
-            color.withValues(alpha: 1),
-            color.withValues(alpha: 0),
-          ],
+          colors: [color.withValues(alpha: 1), color.withValues(alpha: 0)],
           begin: Alignment.center,
           end: Alignment.bottomCenter,
         ),
