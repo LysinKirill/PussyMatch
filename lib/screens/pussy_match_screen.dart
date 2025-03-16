@@ -175,9 +175,7 @@ class CatTinderScreenState extends State<CatTinderScreen> {
   void _showDetailsModal(BuildContext context, Cat cat) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => CatDetailScreen(cat: cat),
-      )
+      MaterialPageRoute(builder: (context) => CatDetailScreen(cat: cat)),
     );
   }
 }

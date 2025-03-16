@@ -12,9 +12,7 @@ class CatDetailScreen extends StatelessWidget {
     final breed = cat.breed;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(breed.name),
-      ),
+      appBar: AppBar(title: Text(breed.name)),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -86,9 +84,7 @@ class CatDetailScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

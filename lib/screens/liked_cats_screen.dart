@@ -22,9 +22,7 @@ class LikedCatsScreenState extends State<LikedCatsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Liked Cats'),
-      ),
+      appBar: AppBar(title: const Text('Liked Cats')),
       body: AnimatedList(
         key: _listKey,
         initialItemCount: widget.likedCats.length,
@@ -52,18 +50,12 @@ class LikedCatsScreenState extends State<LikedCatsScreen> {
               aspectRatio: 1,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  cat.url,
-                  fit: BoxFit.cover,
-                ),
+                child: Image.network(cat.url, fit: BoxFit.cover),
               ),
             ),
             title: Text(
               cat.breed.name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             trailing: IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
@@ -91,7 +83,7 @@ class LikedCatsScreenState extends State<LikedCatsScreen> {
     widget.onRemoveCat(removedCat);
     _listKey.currentState!.removeItem(
       index,
-          (context, animation) => _buildListItem(removedCat, animation, index),
+      (context, animation) => _buildListItem(removedCat, animation, index),
     );
   }
 }
