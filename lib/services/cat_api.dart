@@ -16,7 +16,9 @@ class CatApi {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      if (data.isNotEmpty && data[0]['breeds'] != null && data[0]['breeds'].isNotEmpty) {
+      if (data.isNotEmpty &&
+          data[0]['breeds'] != null &&
+          data[0]['breeds'].isNotEmpty) {
         return Cat.fromJson(data[0]);
       } else {
         throw Exception('No breed information found');

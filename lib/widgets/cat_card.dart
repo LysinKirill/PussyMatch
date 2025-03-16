@@ -12,9 +12,7 @@ class CatCard extends StatelessWidget {
     return Card(
       elevation: 5,
       margin: EdgeInsets.all(16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

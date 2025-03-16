@@ -7,6 +7,7 @@ import '../widgets/action_buttons.dart';
 import '../widgets/heart_counter.dart';
 import '../widgets/detail_modal.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'liked_cats_screen.dart';
 
 class CatTinderScreen extends StatefulWidget {
   const CatTinderScreen({super.key});
@@ -18,15 +19,15 @@ class CatTinderScreen extends StatefulWidget {
 class CatTinderScreenState extends State<CatTinderScreen> {
   static const int bufferSize = 10;
   int _currentIndex = 0;
-  int _likedCount = 0;
   late final CatApi _catApi;
-  final List<Cat> _catQueue = [];
+  final List<Cat> _catBuffer = [];
   late final CardSwiperController _controller;
+  final List<Cat> _likedCats = [];
 
   @override
   void initState() {
     super.initState();
-    final apiKey = dotenv.env['CAT_API_KEY'] ?? ''; // Replace with your API key
+    final apiKey = dotenv.env['CAT_API_KEY'] ?? '';
     _catApi = CatApi(apiKey);
     _preloadCats();
     _controller = CardSwiperController();
@@ -41,19 +42,25 @@ class CatTinderScreenState extends State<CatTinderScreen> {
   Future<void> _fetchNewCat() async {
     try {
       final cat = await _catApi.fetchRandomCat();
-      if (_catQueue.length < bufferSize) {
-        setState(() => _catQueue.add(cat));
+      if (_catBuffer.length < bufferSize) {
+        setState(() => _catBuffer.add(cat));
       } else {
-        setState(() => _catQueue[_currentIndex] = cat);
+        setState(() => _catBuffer[_currentIndex] = cat);
         _currentIndex = (_currentIndex + 1) % bufferSize;
       }
       final imageProvider = NetworkImage(cat.url);
       await precacheImage(imageProvider, context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load a new cat')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to load a new cat')));
     }
+  }
+
+  void _removeLikedCat(Cat cat) {
+    setState(() {
+      _likedCats.remove(cat);
+    });
   }
 
   @override
@@ -66,11 +73,12 @@ class CatTinderScreenState extends State<CatTinderScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
-            BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-            )],
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: Text(
             'PussyMatch',
@@ -84,57 +92,82 @@ class CatTinderScreenState extends State<CatTinderScreen> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 20, left: 20),
-            child: HeartCounter(likedCount: _likedCount),
-          ),
-        ],
-      ),
-      body: _catQueue.isEmpty
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 0.8,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    CardSwiper(
-                      controller: _controller,
-                      cardsCount: _catQueue.length,
-                      cardBuilder: (context, index, percentThresholdX, percentThresholdY) =>
-                          CatCard(cat: _catQueue[index], onTap: () => _showDetailsModal(context, _catQueue[index])),
-                      onSwipe: _onSwipe,
-                      onUndo: _onUndo,
-                    ),
-                  ],
-                ),
-              ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => LikedCatsScreen(
+                          likedCats: _likedCats,
+                          onRemoveCat: _removeLikedCat,
+                        ),
+                  ),
+                );
+              },
+              child: HeartCounter(likedCount: _likedCats.length),
             ),
           ),
-          ActionButtons(controller: _controller),
         ],
       ),
+      body:
+          _catBuffer.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: AspectRatio(
+                        aspectRatio: 0.8,
+                        child: CardSwiper(
+                          controller: _controller,
+                          cardsCount: _catBuffer.length,
+                          cardBuilder:
+                              (context, index, _, __) => CatCard(
+                                cat: _catBuffer[index],
+                                onTap:
+                                    () => _showDetailsModal(
+                                      context,
+                                      _catBuffer[index],
+                                    ),
+                              ),
+                          onSwipe: _onSwipe,
+                          onUndo: _onUndo,
+                        ),
+                      ),
+                    ),
+                  ),
+                  ActionButtons(controller: _controller),
+                ],
+              ),
     );
   }
 
-  bool _onSwipe(int previousIndex, int? currentIndex, CardSwiperDirection direction) {
-    _handleSwipe(direction);
+  bool _onSwipe(
+    int previousIndex,
+    int? currentIndex,
+    CardSwiperDirection direction,
+  ) {
+    _handleSwipe(direction, previousIndex);
     return true;
   }
 
-  bool _onUndo(int? previousIndex, int currentIndex, CardSwiperDirection direction) {
+  bool _onUndo(
+    int? previousIndex,
+    int currentIndex,
+    CardSwiperDirection direction,
+  ) {
     return true;
   }
 
-  void _handleSwipe(CardSwiperDirection direction) {
-    if (_catQueue.isNotEmpty) {
-      setState(() {
-        if (direction == CardSwiperDirection.right) {
-          _likedCount++;
-        }
-      });
-
+  void _handleSwipe(CardSwiperDirection direction, int previousIndex) {
+    if (_catBuffer.isNotEmpty) {
+      final swipedCat = _catBuffer[previousIndex];
+      if (direction == CardSwiperDirection.right) {
+        setState(() {
+          _likedCats.add(swipedCat);
+        });
+      }
       _fetchNewCat();
     }
   }
