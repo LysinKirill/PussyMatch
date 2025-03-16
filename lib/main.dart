@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'PussyMatch',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: CatTinderScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

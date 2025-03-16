@@ -1,16 +1,27 @@
-# pussy_match
+# PussyMatch 🐱
 
-A place to find your purrfect pussy
+PussyMatch is a Tinder-like application for finding the perfect cat breed for you. Swipe through adorable cat images, learn about their breeds, and save your favorites!
 
-## Getting Started
+## Features ✨
+- Swipe or tap to like/dislike cat images.
+- View detailed information about each cat breed.
+- Save your favorite cats and view them later.
+- Custom app icons for a polished look.
 
-This project is a starting point for a Flutter application.
+## Screenshots 📸
+![Main Screen](screenshots/main_screen.png)
+![Liked Cats Screen](screenshots/liked_cats_screen.png)
+![Detail Screen](screenshots/detail_screen.png)
 
-A few resources to get you started if this is your first Flutter project:
+## Download APK 📥
+[Download the latest APK here](https://example.com/pussymatch.apk)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## How to Run 🚀
+1. Clone the repository.
+2. Run `flutter pub get` to install dependencies.
+3. Run `flutter run` to start the app.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Dependencies 📦
+- `http`: For making API requests.
+- `flutter_card_swiper`: For swipe functionality.
+- `flutter_launcher_icons`: For generating app icons.
