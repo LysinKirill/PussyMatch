@@ -14,7 +14,7 @@ PussyMatch is a Tinder-like application for finding the perfect cat breed for yo
 
 ---
 ### Details page
-![Main Screen](screenshots/detailed_description_page.jpg)
+![Detailed Description Screen](screenshots/detailed_description_page.png)
 
 
 <div style="text-align: center;"><h3>Swipe mechanic demonstration </h3></div>
