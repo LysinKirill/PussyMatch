@@ -5,7 +5,7 @@ import '../models/cat_model.dart';
 class DetailModal extends StatelessWidget {
   final Cat cat;
 
-  const DetailModal({required this.cat});
+  const DetailModal({super.key, required this.cat});
 
   @override
   Widget build(BuildContext context) {

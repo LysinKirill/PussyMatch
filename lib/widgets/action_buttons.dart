@@ -4,7 +4,7 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 class ActionButtons extends StatelessWidget {
   final CardSwiperController controller;
 
-  const ActionButtons({required this.controller});
+  const ActionButtons({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

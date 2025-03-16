@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class HeartCounter extends StatelessWidget {
   final int likedCount;
 
-  const HeartCounter({required this.likedCount});
+  const HeartCounter({super.key, required this.likedCount});
 
   @override
   Widget build(BuildContext context) {

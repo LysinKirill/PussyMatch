@@ -9,11 +9,13 @@ import '../widgets/detail_modal.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class CatTinderScreen extends StatefulWidget {
+  const CatTinderScreen({super.key});
+
   @override
-  _CatTinderScreenState createState() => _CatTinderScreenState();
+  CatTinderScreenState createState() => CatTinderScreenState();
 }
 
-class _CatTinderScreenState extends State<CatTinderScreen> {
+class CatTinderScreenState extends State<CatTinderScreen> {
   static const int bufferSize = 10;
   int _currentIndex = 0;
   int _likedCount = 0;
@@ -48,7 +50,6 @@ class _CatTinderScreenState extends State<CatTinderScreen> {
       final imageProvider = NetworkImage(cat.url);
       await precacheImage(imageProvider, context);
     } catch (e) {
-      print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load a new cat')),
       );

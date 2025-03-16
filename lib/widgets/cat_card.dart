@@ -5,7 +5,7 @@ class CatCard extends StatelessWidget {
   final Cat cat;
   final VoidCallback onTap;
 
-  const CatCard({required this.cat, required this.onTap});
+  const CatCard({super.key, required this.cat, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
