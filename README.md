@@ -14,7 +14,7 @@ PussyMatch is a Tinder-like application for finding the perfect cat breed for yo
 ![Detail Screen](screenshots/detail_screen.png)
 
 ## Download APK 📥
-[Download the latest APK here](https://example.com/pussymatch.apk)
+[Download the latest APK here](https://github.com/LysinKirill/PussyMatch/releases/download/v0.6.9/app-release.apk)
 
 ## How to Run 🚀
 1. Clone the repository.
