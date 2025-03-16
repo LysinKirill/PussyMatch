@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../models/cat_model.dart';
 
 class CatApi {
   String apiKey;
@@ -7,7 +8,7 @@ class CatApi {
 
   CatApi(this.apiKey);
 
-  Future<Map<String, dynamic>> fetchRandomCat() async {
+  Future<Cat> fetchRandomCat() async {
     final response = await http.get(
       Uri.parse('$baseUrl/images/search?has_breeds=true'),
       headers: {'x-api-key': apiKey},
@@ -16,7 +17,7 @@ class CatApi {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data.isNotEmpty && data[0]['breeds'] != null && data[0]['breeds'].isNotEmpty) {
-        return data[0];
+        return Cat.fromJson(data[0]);
       } else {
         throw Exception('No breed information found');
       }
