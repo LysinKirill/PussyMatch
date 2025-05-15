@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import '../models/cat_model.dart';
-import '../screens/cat_details_screen.dart';
+import '../../domain/entities/cat.dart';
 
 class CatCard extends StatelessWidget {
   final Cat cat;
   final VoidCallback onTap;
 
-  const CatCard({super.key, required this.cat, required this.onTap});
+  const CatCard({
+    super.key,
+    required this.cat,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,23 +23,25 @@ class CatCard extends StatelessWidget {
           AspectRatio(
             aspectRatio: 1,
             child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CatDetailScreen(cat: cat),
-                  ),
-                );
-              },
+              onTap: onTap,
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(15),
                 ),
                 child: Image.network(
-                  cat.url,
+                  cat.imageUrl,
                   fit: BoxFit.cover,
-                  height: 300,
-                  width: double.infinity,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
