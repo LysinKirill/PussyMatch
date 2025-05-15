@@ -2,8 +2,14 @@ class Cat {
   final String id;
   final String url;
   final CatBreed breed;
+  final DateTime likedTimestamp;
 
-  Cat({required this.id, required this.url, required this.breed});
+  Cat({
+    required this.id,
+    required this.url,
+    required this.breed,
+    DateTime? likedTimestamp
+  }) : likedTimestamp = likedTimestamp ?? DateTime.now();
 
   factory Cat.fromJson(Map<String, dynamic> json) {
     return Cat(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/cat_model.dart';
-import '../screens/cat_details_screen.dart'; // Import the new detail screen
+import '../screens/cat_details_screen.dart';
 
 class LikedCatsScreen extends StatefulWidget {
   final List<Cat> likedCats;
@@ -56,6 +57,10 @@ class LikedCatsScreenState extends State<LikedCatsScreen> {
             title: Text(
               cat.breed.name,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            subtitle: Text(
+              'Лайкнут: ${DateFormat('dd.MM.yyyy HH:mm').format(cat.likedTimestamp)}',
+              style: TextStyle(color: Colors.grey[600]),
             ),
             trailing: IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
