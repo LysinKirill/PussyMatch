@@ -9,8 +9,27 @@ import '../widgets/action_buttons.dart';
 import '../widgets/heart_counter.dart';
 import 'liked_cats_page.dart';
 
-class CatListPage extends StatelessWidget {
+class CatListPage extends StatefulWidget {
   const CatListPage({super.key});
+
+  @override
+  State<CatListPage> createState() => _CatListPageState();
+}
+
+class _CatListPageState extends State<CatListPage> {
+  late final CardSwiperController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = CardSwiperController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,12 +41,11 @@ class CatListPage extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+            )],
           ),
           child: Text(
             'PussyMatch',
@@ -41,8 +59,7 @@ class CatListPage extends StatelessWidget {
         actions: [
           BlocBuilder<LikedCatsBloc, LikedCatsState>(
             builder: (context, state) {
-              final likedCount =
-              state is LikedCatsLoaded ? state.cats.length : 0;
+              final likedCount = state is LikedCatsLoaded ? state.cats.length : 0;
               return Padding(
                 padding: const EdgeInsets.only(right: 20, left: 20),
                 child: GestureDetector(
@@ -85,30 +102,30 @@ class CatListPage extends StatelessWidget {
   }
 
   Widget _buildCatSwiper(BuildContext context, List<Cat> cats, int currentIndex) {
-    final controller = CardSwiperController();
-    final displayedCats = cats;
-
     return Column(
       children: [
         Expanded(
           child: CardSwiper(
-            controller: controller,
-            cardsCount: displayedCats.length,
+            controller: _controller,
+            cardsCount: cats.length,
             cardBuilder: (context, index, _, __) => CatCard(
-              cat: displayedCats[index],
-              onTap: () => _showCatDetails(context, displayedCats[index]),
+              cat: cats[index],
+              onTap: () => _showCatDetails(context, cats[index]),
             ),
             onSwipe: (prevIndex, currentIndex, direction) {
               if (direction == CardSwiperDirection.right) {
-                final cat = displayedCats[prevIndex!];
-                context.read<LikedCatsBloc>().add(AddLikedCat(cat: cat));
+                context.read<LikedCatsBloc>().add(AddLikedCat(cat: cats[prevIndex]));
               }
               context.read<CatListBloc>().add(const CatSwiped());
               return true;
             },
           ),
         ),
-        ActionButtons(controller: controller),
+        ActionButtons(
+          controller: _controller,
+          currentIndex: currentIndex,
+          cats: cats,
+        ),
       ],
     );
   }
