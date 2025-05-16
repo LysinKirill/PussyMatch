@@ -10,13 +10,8 @@ import 'domain/usecases/get_cats.dart';
 import 'presentation/pages/cat_list_page.dart';
 
 Future<void> main() async {
-  // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize dependencies
-  await init();
-
-  // Load environment variables
+  await init(); // Your DI setup
   await dotenv.load(fileName: ".env");
 
   runApp(const MyApp());
@@ -27,32 +22,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => GetIt.instance<CatListBloc>()
-              ..add(const LoadRandomCats())
+    return MaterialApp(
+      title: 'PussyMatch',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          centerTitle: true,
         ),
-        BlocProvider(
-          create: (context) => GetIt.instance<LikedCatsBloc>(),
-        ),
-        RepositoryProvider<GetCats>(
-          create: (_) => GetIt.instance<GetCats>(),
-        )
-      ],
-      child: MaterialApp(
-        title: 'PussyMatch',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          appBarTheme: const AppBarTheme(
-            elevation: 0,
-            centerTitle: true,
-          ),
-        ),
-        home: const CatListPage(),
-        debugShowCheckedModeBanner: false,
       ),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => GetIt.instance<CatListBloc>()
+              ..add(const LoadRandomCats()),
+          ),
+          BlocProvider(
+            create: (context) => GetIt.instance<LikedCatsBloc>(),
+          ),
+        ],
+        child: const CatListPage(),
+      ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

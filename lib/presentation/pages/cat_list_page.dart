@@ -14,91 +14,78 @@ class CatListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create:
-              (context) =>
-                  CatListBloc(getCats: context.read())
-                    ..add(const LoadRandomCats()),
-        ),
-        BlocProvider(
-          create: (context) => LikedCatsBloc(
-            getLikedCats: context.read(),
-            likeCat: context.read(),
-            unlikeCat: context.read(),
-          ),
-        ),
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              'PussyMatch',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue[800],
+    return Scaffold(
+      appBar: AppBar(
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
+            ],
+          ),
+          child: Text(
+            'PussyMatch',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue[800],
             ),
           ),
-          actions: [
-            BlocBuilder<LikedCatsBloc, LikedCatsState>(
-              builder: (context, state) {
-                final likedCount =
-                    state is LikedCatsLoaded ? state.cats.length : 0;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 20, left: 20),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LikedCatsPage(),
-                        ),
-                      );
-                    },
-                    child: HeartCounter(likedCount: likedCount),
-                  ),
-                );
-              },
-            ),
-          ],
         ),
-        body: BlocConsumer<CatListBloc, CatListState>(
-          listener: (context, state) {
-            if (state is CatListError) {
-              _showErrorDialog(context, state.message);
-            }
-          },
-          builder: (context, state) {
-            if (state is CatListLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is CatListLoaded) {
-              return _buildCatSwiper(context, state.cats, state.currentIndex);
-            } else if (state is CatListError) {
-              return Center(child: Text(state.message));
-            }
+        actions: [
+          BlocBuilder<LikedCatsBloc, LikedCatsState>(
+            builder: (context, state) {
+              final likedCount =
+                  state is LikedCatsLoaded ? state.cats.length : 0;
+              return Padding(
+                padding: const EdgeInsets.only(right: 20, left: 20),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LikedCatsPage(),
+                      ),
+                    );
+                  },
+                  child: HeartCounter(likedCount: likedCount),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      body: BlocConsumer<CatListBloc, CatListState>(
+        listener: (context, state) {
+          if (state is CatListError) {
+            _showErrorDialog(context, state.message);
+          }
+        },
+        builder: (context, state) {
+          if (state is CatListLoading) {
             return const Center(child: CircularProgressIndicator());
-          },
-        ),
+          } else if (state is CatListLoaded) {
+            return _buildCatSwiper(context, state.cats, state.currentIndex);
+          } else if (state is CatListError) {
+            return Center(child: Text(state.message));
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
       ),
     );
   }
 
-  Widget _buildCatSwiper(BuildContext context, List<Cat> cats, int currentIndex) {
+  Widget _buildCatSwiper(
+    BuildContext context,
+    List<Cat> cats,
+    int currentIndex,
+  ) {
     final controller = CardSwiperController();
     //final displayedCats = cats.sublist(currentIndex);
     final displayedCats = cats;
@@ -109,10 +96,11 @@ class CatListPage extends StatelessWidget {
           child: CardSwiper(
             controller: controller,
             cardsCount: displayedCats.length,
-            cardBuilder: (context, index, _, __) => CatCard(
-              cat: displayedCats[index],
-              onTap: () => _showCatDetails(context, displayedCats[index]),
-            ),
+            cardBuilder:
+                (context, index, _, __) => CatCard(
+                  cat: displayedCats[index],
+                  onTap: () => _showCatDetails(context, displayedCats[index]),
+                ),
             onSwipe: (prevIndex, currentIndex, direction) {
               if (direction == CardSwiperDirection.right) {
                 context.read<LikedCatsBloc>().add(
