@@ -15,3 +15,7 @@ class LoadRandomCats extends CatListEvent {
   @override
   List<Object> get props => [limit];
 }
+
+class CatSwiped extends CatListEvent {
+  const CatSwiped();
+}

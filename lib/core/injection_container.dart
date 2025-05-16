@@ -19,6 +19,11 @@ Future<void> init() async {
   await dotenv.load(fileName: ".env");
   sl.registerLazySingleton(() => http.Client());
 
+  sl.registerLazySingleton(() => GetCats(repository: sl()));
+  sl.registerLazySingleton(() => GetLikedCats(repository: sl()));
+  sl.registerLazySingleton(() => LikeCat(repository: sl()));
+  sl.registerLazySingleton(() => UnlikeCat(repository: sl()));
+
   //! Data Sources
   sl.registerLazySingleton<CatRemoteDataSource>(
         () => CatRemoteDataSource(
@@ -36,10 +41,7 @@ Future<void> init() async {
   );
 
   //! Use Cases
-  sl.registerLazySingleton(() => GetCats(repository: sl()));
-  sl.registerLazySingleton(() => GetLikedCats(repository: sl()));
-  sl.registerLazySingleton(() => LikeCat(repository: sl()));
-  sl.registerLazySingleton(() => UnlikeCat(repository: sl()));
+
 
   //! Blocs
   sl.registerFactory(

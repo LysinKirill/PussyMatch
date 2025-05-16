@@ -22,6 +22,13 @@ class CatListPage extends StatelessWidget {
                   CatListBloc(getCats: context.read())
                     ..add(const LoadRandomCats()),
         ),
+        BlocProvider(
+          create: (context) => LikedCatsBloc(
+            getLikedCats: context.read(),
+            likeCat: context.read(),
+            unlikeCat: context.read(),
+          ),
+        ),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -80,7 +87,7 @@ class CatListPage extends StatelessWidget {
             if (state is CatListLoading) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is CatListLoaded) {
-              return _buildCatSwiper(context, state.cats);
+              return _buildCatSwiper(context, state.cats, state.currentIndex);
             } else if (state is CatListError) {
               return Center(child: Text(state.message));
             }
@@ -91,27 +98,28 @@ class CatListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCatSwiper(BuildContext context, List<Cat> cats) {
+  Widget _buildCatSwiper(BuildContext context, List<Cat> cats, int currentIndex) {
     final controller = CardSwiperController();
+    //final displayedCats = cats.sublist(currentIndex);
+    final displayedCats = cats;
 
     return Column(
       children: [
         Expanded(
           child: CardSwiper(
             controller: controller,
-            cardsCount: cats.length,
-            cardBuilder:
-                (context, index, _, __) => CatCard(
-                  cat: cats[index],
-                  onTap: () => _showCatDetails(context, cats[index]),
-                ),
+            cardsCount: displayedCats.length,
+            cardBuilder: (context, index, _, __) => CatCard(
+              cat: displayedCats[index],
+              onTap: () => _showCatDetails(context, displayedCats[index]),
+            ),
             onSwipe: (prevIndex, currentIndex, direction) {
               if (direction == CardSwiperDirection.right) {
                 context.read<LikedCatsBloc>().add(
-                  AddLikedCat(cat: cats[prevIndex]),
+                  AddLikedCat(cat: displayedCats[prevIndex]),
                 );
               }
-              context.read<CatListBloc>().add(const LoadRandomCats(limit: 1));
+              context.read<CatListBloc>().add(const CatSwiped());
               return true;
             },
           ),

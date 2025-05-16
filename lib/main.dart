@@ -6,6 +6,7 @@ import 'package:pussy_match/presentation/bloc/cat_list/cat_list_bloc.dart';
 import 'package:pussy_match/presentation/bloc/liked_cats/liked_cats_bloc.dart';
 
 import 'core/injection_container.dart';
+import 'domain/usecases/get_cats.dart';
 import 'presentation/pages/cat_list_page.dart';
 
 Future<void> main() async {
@@ -29,11 +30,15 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => GetIt.instance<CatListBloc>(),
+          create: (context) => GetIt.instance<CatListBloc>()
+              ..add(const LoadRandomCats())
         ),
         BlocProvider(
           create: (context) => GetIt.instance<LikedCatsBloc>(),
         ),
+        RepositoryProvider<GetCats>(
+          create: (_) => GetIt.instance<GetCats>(),
+        )
       ],
       child: MaterialApp(
         title: 'PussyMatch',
