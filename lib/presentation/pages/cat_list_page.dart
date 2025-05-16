@@ -42,7 +42,7 @@ class CatListPage extends StatelessWidget {
           BlocBuilder<LikedCatsBloc, LikedCatsState>(
             builder: (context, state) {
               final likedCount =
-                  state is LikedCatsLoaded ? state.cats.length : 0;
+              state is LikedCatsLoaded ? state.cats.length : 0;
               return Padding(
                 padding: const EdgeInsets.only(right: 20, left: 20),
                 child: GestureDetector(
@@ -50,7 +50,10 @@ class CatListPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LikedCatsPage(),
+                        builder: (context) => BlocProvider.value(
+                          value: BlocProvider.of<LikedCatsBloc>(context),
+                          child: const LikedCatsPage(),
+                        ),
                       ),
                     );
                   },
@@ -81,13 +84,8 @@ class CatListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCatSwiper(
-    BuildContext context,
-    List<Cat> cats,
-    int currentIndex,
-  ) {
+  Widget _buildCatSwiper(BuildContext context, List<Cat> cats, int currentIndex) {
     final controller = CardSwiperController();
-    //final displayedCats = cats.sublist(currentIndex);
     final displayedCats = cats;
 
     return Column(
@@ -96,16 +94,14 @@ class CatListPage extends StatelessWidget {
           child: CardSwiper(
             controller: controller,
             cardsCount: displayedCats.length,
-            cardBuilder:
-                (context, index, _, __) => CatCard(
-                  cat: displayedCats[index],
-                  onTap: () => _showCatDetails(context, displayedCats[index]),
-                ),
+            cardBuilder: (context, index, _, __) => CatCard(
+              cat: displayedCats[index],
+              onTap: () => _showCatDetails(context, displayedCats[index]),
+            ),
             onSwipe: (prevIndex, currentIndex, direction) {
               if (direction == CardSwiperDirection.right) {
-                context.read<LikedCatsBloc>().add(
-                  AddLikedCat(cat: displayedCats[prevIndex]),
-                );
+                final cat = displayedCats[prevIndex!];
+                context.read<LikedCatsBloc>().add(AddLikedCat(cat: cat));
               }
               context.read<CatListBloc>().add(const CatSwiped());
               return true;

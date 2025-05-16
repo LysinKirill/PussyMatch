@@ -10,30 +10,37 @@ class LikedCatsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Liked Cats'),
-        actions: [
-          FilterDropdown(
-            onBreedSelected: (breedId) {
-              context.read<LikedCatsBloc>().add(
-                FilterLikedCatsByBreed(breedId: breedId),
-              );
-            },
-          ),
-        ],
-      ),
-      body: BlocBuilder<LikedCatsBloc, LikedCatsState>(
-        builder: (context, state) {
-          if (state is LikedCatsLoading) {
+    return BlocProvider.value(
+      value: BlocProvider.of<LikedCatsBloc>(context),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Liked Cats'),
+          actions: [
+            BlocBuilder<LikedCatsBloc, LikedCatsState>(
+              builder: (context, state) {
+                return FilterDropdown(
+                  onBreedSelected: (breedId) {
+                    context.read<LikedCatsBloc>().add(
+                      FilterLikedCatsByBreed(breedId: breedId),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+        body: BlocBuilder<LikedCatsBloc, LikedCatsState>(
+          builder: (context, state) {
+            if (state is LikedCatsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is LikedCatsLoaded) {
+              return _buildCatList(context, state.cats);
+            } else if (state is LikedCatsError) {
+              return Center(child: Text(state.message));
+            }
             return const Center(child: CircularProgressIndicator());
-          } else if (state is LikedCatsLoaded) {
-            return _buildCatList(context, state.cats);
-          } else if (state is LikedCatsError) {
-            return Center(child: Text(state.message));
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
+          },
+        ),
       ),
     );
   }
