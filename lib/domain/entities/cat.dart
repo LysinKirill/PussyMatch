@@ -19,9 +19,18 @@ class CatBreed {
   final String temperament;
   final String origin;
   final String lifeSpan;
+  final Map<String, dynamic> weight;
   final int adaptability;
   final int affectionLevel;
+  final int childFriendly;
+  final int dogFriendly;
+  final int energyLevel;
+  final int healthIssues;
   final int intelligence;
+  final int socialNeeds;
+  final int strangerFriendly;
+  final int vocalisation;
+  final String wikipediaUrl;
 
   CatBreed({
     required this.id,
@@ -30,8 +39,17 @@ class CatBreed {
     required this.temperament,
     required this.origin,
     required this.lifeSpan,
+    required this.weight,
     required this.adaptability,
     required this.affectionLevel,
+    required this.childFriendly,
+    required this.dogFriendly,
+    required this.energyLevel,
+    required this.healthIssues,
     required this.intelligence,
+    required this.socialNeeds,
+    required this.strangerFriendly,
+    required this.vocalisation,
+    required this.wikipediaUrl,
   });
 }

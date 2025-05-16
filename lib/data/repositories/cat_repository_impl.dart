@@ -49,7 +49,16 @@ class CatRepositoryImpl implements CatRepository {
         lifeSpan: breedDto.lifeSpan,
         adaptability: breedDto.adaptability,
         affectionLevel: breedDto.affectionLevel,
+        childFriendly: breedDto.childFriendly,
+        dogFriendly: breedDto.dogFriendly,
+        energyLevel: breedDto.energyLevel,
+        healthIssues: breedDto.healthIssues,
         intelligence: breedDto.intelligence,
+        socialNeeds: breedDto.socialNeeds,
+        strangerFriendly: breedDto.strangerFriendly,
+        vocalisation: breedDto.vocalisation,
+        wikipediaUrl: breedDto.wikipediaUrl,
+        weight: breedDto.weight
       ),
     );
   }

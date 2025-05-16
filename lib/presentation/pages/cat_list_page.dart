@@ -8,6 +8,7 @@ import '../widgets/cat_card.dart';
 import '../widgets/action_buttons.dart';
 import '../widgets/heart_counter.dart';
 import 'liked_cats_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CatListPage extends StatefulWidget {
   const CatListPage({super.key});
@@ -134,21 +135,258 @@ class _CatListPageState extends State<CatListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder:
-            (context) => Scaffold(
-              appBar: AppBar(title: Text(cat.breed.name)),
-              body: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Image.network(cat.imageUrl),
-                    Text(cat.breed.description),
-                    // Add more details here
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            title: Text(cat.breed.name),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () => _confirmDelete(context, cat),
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AspectRatio(
+                    aspectRatio: 1,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        cat.imageUrl,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: Colors.grey[200],
+                          child: const Center(child: Icon(Icons.error)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _buildDetailCard('Description', cat.breed.description),
+                  const SizedBox(height: 16),
+                  _buildDetailCard('Temperament', cat.breed.temperament),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDetailCard(
+                          'Life Span',
+                          cat.breed.lifeSpan,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildDetailCard(
+                          'Origin',
+                          cat.breed.origin,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildCategoryTag('Adaptability', cat.breed.adaptability),
+                      _buildCategoryTag('Affection Level', cat.breed.affectionLevel),
+                      _buildCategoryTag('Intelligence', cat.breed.intelligence),
+                      _buildCategoryTag('Energy Level', cat.breed.energyLevel),
+                      _buildCategoryTag('Health Issues', cat.breed.healthIssues),
+                      _buildCategoryTag('Social Needs', cat.breed.socialNeeds),
+                    ],
+                  ),
+                  if (cat.breed.wikipediaUrl.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          launchUrl(Uri.parse(cat.breed.wikipediaUrl));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue[800],
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Open Wikipedia',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
+          ),
+        ),
       ),
     );
+  }
+
+  void _confirmDelete(BuildContext context, Cat cat) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Cat'),
+        content: Text('Remove ${cat.breed.name} from favorites?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<LikedCatsBloc>().add(RemoveLikedCat(catId: cat.id));
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Removed ${cat.breed.name}'),
+                  action: SnackBarAction(
+                    label: 'Undo',
+                    onPressed: () {
+                      context.read<LikedCatsBloc>().add(AddLikedCat(cat: cat));
+                    },
+                  ),
+                ),
+              );
+            },
+            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailCard(String label, String value) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.blueGrey[800],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryTag(String category, int score) {
+    final tag = _getTagForCategory(category, score);
+    final color = _getColorForScore(score);
+    final textColor = _getTextColorForScore(score);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: textColor.withOpacity(0.2),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$category: ',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
+          ),
+          Text(
+            tag,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getTagForCategory(String category, int score) {
+    switch (category) {
+      case 'Adaptability':
+        return ['★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'][score - 1];
+      case 'Affection Level':
+        return ['★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'][score - 1];
+      case 'Intelligence':
+        return ['★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'][score - 1];
+      case 'Energy Level':
+        return ['★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'][score - 1];
+      case 'Health Issues':
+        return ['★★★★★', '★★★★☆', '★★★☆☆', '★★☆☆☆', '★☆☆☆☆'][5 - score]; // Inverted
+      case 'Social Needs':
+        return ['★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'][score - 1];
+      default:
+        return List.filled(score, '★').join() + List.filled(5 - score, '☆').join();
+    }
+  }
+  Color _getColorForScore(int score) {
+    switch (score) {
+      case 1:
+        return Colors.red;
+      case 2:
+        return Colors.orange;
+      case 3:
+        return Colors.yellow[700]!;
+      case 4:
+        return Colors.lightGreen;
+      case 5:
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Color _getTextColorForScore(int score) {
+    switch (score) {
+      case 1:
+        return Colors.red[800]!;
+      case 2:
+        return Colors.orange[800]!;
+      case 3:
+        return Colors.yellow[900]!;
+      case 4:
+        return Colors.green[800]!;
+      case 5:
+        return Colors.green[900]!;
+      default:
+        return Colors.black;
+    }
   }
 
   void _showErrorDialog(BuildContext context, String message) {
