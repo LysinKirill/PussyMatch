@@ -17,6 +17,7 @@ import '../presentation/bloc/liked_cats/liked_cats_bloc.dart';
 import '../../data/datasources/local/cat_local_data_source.dart';
 import '../../core/database/database_helper.dart';
 import 'package:path/path.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import 'network/network_bloc.dart';
 
@@ -47,12 +48,15 @@ Future<void> init() async {
   sl.registerLazySingleton(() => UnlikeCat(repository: sl()));
 
   //! Data Sources
+  sl.registerLazySingleton(() => DefaultCacheManager());
   sl.registerLazySingleton<CatRemoteDataSource>(
-        () => CatRemoteDataSource(
-      client: sl(),
-      baseUrl: 'https://api.thecatapi.com/v1',
-      apiKey: dotenv.env['CAT_API_KEY']!,
-    ),
+        () =>
+        CatRemoteDataSource(
+            client: sl(),
+            baseUrl: 'https://api.thecatapi.com/v1',
+            apiKey: dotenv.env['CAT_API_KEY']!,
+            cacheManager: sl()
+        ),
   );
 
   sl.registerLazySingleton<CatLocalDataSource>(
