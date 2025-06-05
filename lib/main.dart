@@ -7,6 +7,7 @@ import 'package:pussy_match/presentation/bloc/liked_cats/liked_cats_bloc.dart';
 import 'package:pussy_match/presentation/pages/cat_list_page.dart';
 
 import 'core/injection_container.dart';
+import 'core/network/network_bloc.dart';
 
 Future<void> main() async {
   // Ensure Flutter binding is initialized
@@ -28,6 +29,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => GetIt.instance<NetworkBloc>(),
+        ),
         BlocProvider(
           create: (context) => GetIt.instance<CatListBloc>()
             ..add(const LoadRandomCats(limit: 10)),

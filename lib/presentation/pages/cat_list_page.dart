@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import '../../core/network/network_bloc.dart';
 import '../../domain/entities/cat.dart';
 import '../bloc/cat_list/cat_list_bloc.dart';
 import '../bloc/liked_cats/liked_cats_bloc.dart';
@@ -23,7 +24,22 @@ class _CatListPageState extends State<CatListPage> {
   @override
   void initState() {
     super.initState();
+    _checkNetworkStatus();
     _controller = CardSwiperController();
+  }
+
+  void _checkNetworkStatus() {
+    final networkBloc = context.read<NetworkBloc>();
+    networkBloc.stream.distinct().listen((isConnected) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(isConnected
+              ? 'Back online'
+              : 'No internet connection - using cached data'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    });
   }
 
   @override
@@ -58,6 +74,15 @@ class _CatListPageState extends State<CatListPage> {
           ),
         ),
         actions: [
+          BlocBuilder<NetworkBloc, bool>(
+            builder: (context, isConnected) {
+              return Icon(
+                isConnected ? Icons.wifi : Icons.wifi_off,
+                color: isConnected ? Colors.green : Colors.red,
+              );
+            },
+          ),
+          SizedBox(width: 16),
           BlocBuilder<LikedCatsBloc, LikedCatsState>(
             builder: (context, state) {
               final likedCount = state is LikedCatsLoaded ? state.cats.length : 0;

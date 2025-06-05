@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -17,6 +18,8 @@ import '../../data/datasources/local/cat_local_data_source.dart';
 import '../../core/database/database_helper.dart';
 import 'package:path/path.dart';
 
+import 'network/network_bloc.dart';
+
 final sl = GetIt.instance;
 
 Future<Database> _initDatabase() async {
@@ -27,6 +30,9 @@ Future<Database> _initDatabase() async {
 
 
 Future<void> init() async {
+  sl.registerLazySingleton(() => Connectivity());
+  sl.registerLazySingleton(() => NetworkBloc(connectivity: sl()));
+
   //! Initialize Database
   final database = await _initDatabase();
   sl.registerLazySingleton<Database>(() => database);

@@ -31,11 +31,13 @@ class CatRepositoryImpl implements CatRepository {
   @override
   Future<void> likeCat(Cat cat) async {
     _likedCats.add(cat);
+    await localDataSource.likeCat(CatModel.fromEntity(cat));
   }
 
   @override
   Future<void> unlikeCat(String catId) async {
     _likedCats.removeWhere((cat) => cat.id == catId);
+    await localDataSource.unlikeCat(catId);
   }
 
   @override
