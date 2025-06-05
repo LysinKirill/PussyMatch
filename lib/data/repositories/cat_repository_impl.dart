@@ -1,6 +1,4 @@
 import 'package:pussy_match/data/datasources/local/cat_local_data_source.dart';
-
-import '../../core/errors/exceptions.dart';
 import '../../domain/entities/cat.dart';
 import '../../domain/repositories/cat_repository.dart';
 import '../datasources/cat_remote_data_source.dart';

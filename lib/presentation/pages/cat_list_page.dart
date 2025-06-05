@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,6 +23,7 @@ class CatListPage extends StatefulWidget {
 
 class _CatListPageState extends State<CatListPage> {
   late final CardSwiperController _controller;
+  StreamSubscription? _networkSubscription;
 
   @override
   void initState() {
@@ -29,9 +32,20 @@ class _CatListPageState extends State<CatListPage> {
     _controller = CardSwiperController();
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    _networkSubscription?.cancel();
+    super.dispose();
+  }
+
+
+
   void _checkNetworkStatus() {
     final networkBloc = context.read<NetworkBloc>();
-    networkBloc.stream.distinct().listen((isConnected) {
+    _networkSubscription = networkBloc.stream.distinct().listen((isConnected) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(isConnected
@@ -43,11 +57,6 @@ class _CatListPageState extends State<CatListPage> {
     });
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -329,10 +338,10 @@ class _CatListPageState extends State<CatListPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: textColor.withOpacity(0.2),
+          color: textColor.withValues(alpha: 0.2),
           width: 1.5,
         ),
       ),
