@@ -70,7 +70,6 @@ class LikedCatsBloc extends Bloc<LikedCatsEvent, LikedCatsState> {
       Emitter<LikedCatsState> emit,
       ) async {
     if (state is LikedCatsLoaded) {
-      final currentState = state as LikedCatsLoaded;
       final cats = await getLikedCats();
       final filteredCats = event.breedId == null
           ? cats

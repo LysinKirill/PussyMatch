@@ -188,13 +188,26 @@ class LikedCatsPage extends StatelessWidget {
               body: SingleChildScrollView(
                 child: Column(
                   children: [
-                    CachedNetworkImage(
-                      imageUrl: cat.imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder:
-                          (context, url) =>
-                              Center(child: CircularProgressIndicator()),
-                      //errorWidget: (context, url, error) => Icon(Icons.error),
+                    SizedBox(
+                      width: 56,  // Fixed width
+                      height: 56, // Fixed height
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: cat.imageUrl,
+                          fit: BoxFit.cover,
+                          width: 56,
+                          height: 56,
+                          placeholder: (context, url) => Container(
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.pets, color: Colors.grey),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.error, color: Colors.red),
+                          ),
+                        ),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16),
