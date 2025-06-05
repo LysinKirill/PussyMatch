@@ -1,3 +1,6 @@
+import 'package:pussy_match/data/datasources/local/cat_local_data_source.dart';
+
+import '../../core/errors/exceptions.dart';
 import '../../domain/entities/cat.dart';
 import '../../domain/repositories/cat_repository.dart';
 import '../datasources/cat_remote_data_source.dart';
@@ -5,14 +8,23 @@ import '../dtos/cat_dto.dart';
 
 class CatRepositoryImpl implements CatRepository {
   final CatRemoteDataSource remoteDataSource;
+  final CatLocalDataSource localDataSource;
   final List<Cat> _likedCats = [];
 
-  CatRepositoryImpl({required this.remoteDataSource});
+  CatRepositoryImpl({required this.remoteDataSource, required this.localDataSource});
 
   @override
   Future<List<Cat>> getRandomCats(int limit) async {
-    final catDtos = await remoteDataSource.getRandomCats(limit);
-    return catDtos.map(_mapDtoToEntity).toList();
+    try {
+      final catDtos = await remoteDataSource.getRandomCats(limit);
+      final cats = catDtos.map(_mapDtoToEntity).toList();
+      await localDataSource.cacheCats(cats.map((e) => CatDto.fromEntity(e)).toList());
+      return cats;
+    } catch (e) {
+      final cached = await localDataSource.getCachedCats();
+      if (cached.isNotEmpty) return cached.map((e) => e.toEntity()).toList();
+      throw ServerException(message: 'No cached data available');
+    }
   }
 
   @override
