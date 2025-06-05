@@ -1,6 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 
-
 class DatabaseHelper {
   static Future<Database> initializeDatabase(String path) async {
     return openDatabase(

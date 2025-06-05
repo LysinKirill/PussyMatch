@@ -6,7 +6,6 @@ import '../../core/errors/exceptions.dart';
 import '../dtos/cat_dto.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-
 class CatRemoteDataSource {
   final http.Client client;
   final String baseUrl;
@@ -17,7 +16,7 @@ class CatRemoteDataSource {
     required this.client,
     required this.baseUrl,
     required this.apiKey,
-    required this.cacheManager
+    required this.cacheManager,
   });
 
   Future<List<CatDto>> getRandomCats(int limit) async {

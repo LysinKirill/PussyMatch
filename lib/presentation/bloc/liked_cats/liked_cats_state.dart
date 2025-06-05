@@ -15,10 +15,7 @@ class LikedCatsLoaded extends LikedCatsState {
   final List<Cat> cats;
   final String? filteredBreedId;
 
-  const LikedCatsLoaded({
-    required this.cats,
-    this.filteredBreedId,
-  });
+  const LikedCatsLoaded({required this.cats, this.filteredBreedId});
 
   @override
   List<Object> get props => [cats, filteredBreedId ?? ''];

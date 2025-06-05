@@ -6,11 +6,7 @@ class CatCard extends StatelessWidget {
   final Cat cat;
   final VoidCallback onTap;
 
-  const CatCard({
-    super.key,
-    required this.cat,
-    required this.onTap,
-  });
+  const CatCard({super.key, required this.cat, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +28,9 @@ class CatCard extends StatelessWidget {
                 child: CachedNetworkImage(
                   imageUrl: cat.imageUrl,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                  placeholder:
+                      (context, url) =>
+                          Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),

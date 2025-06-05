@@ -23,10 +23,12 @@ class FilterDropdown extends StatelessWidget {
             value: null,
             child: Text('All Breeds'),
           ),
-          ...breeds.entries.map((entry) => DropdownMenuItem<String>(
-            value: entry.key,
-            child: Text(entry.value),
-          )),
+          ...breeds.entries.map(
+            (entry) => DropdownMenuItem<String>(
+              value: entry.key,
+              child: Text(entry.value),
+            ),
+          ),
         ];
 
         return Container(

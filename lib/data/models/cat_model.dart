@@ -154,7 +154,9 @@ class CatModel {
       breedStrangerFriendly: map['breedStrangerFriendly'],
       breedVocalisation: map['breedVocalisation'],
       breedWikipediaUrl: map['breedWikipediaUrl'],
-      likedTimestamp: DateTime.fromMillisecondsSinceEpoch(map['likedTimestamp']),
+      likedTimestamp: DateTime.fromMillisecondsSinceEpoch(
+        map['likedTimestamp'],
+      ),
     );
   }
 }

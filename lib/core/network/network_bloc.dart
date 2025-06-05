@@ -8,8 +8,8 @@ class NetworkBloc extends Cubit<bool> {
   late StreamSubscription _subscription;
 
   NetworkBloc({required Connectivity connectivity})
-      : _connectivity = connectivity,
-        super(true) {
+    : _connectivity = connectivity,
+      super(true) {
     _subscription = _connectivity.onConnectivityChanged.listen((result) {
       emit(result != ConnectivityResult.none);
     });

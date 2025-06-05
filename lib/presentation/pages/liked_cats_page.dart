@@ -101,7 +101,7 @@ class LikedCatsPage extends StatelessWidget {
           },
           child: ListTile(
             leading: SizedBox(
-              width: 56,  // Fixed width
+              width: 56, // Fixed width
               height: 56, // Fixed height
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
@@ -110,14 +110,16 @@ class LikedCatsPage extends StatelessWidget {
                   fit: BoxFit.cover,
                   width: 56,
                   height: 56,
-                  placeholder: (context, url) => Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.pets, color: Colors.grey),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: Colors.grey[200],
-                    child: const Icon(Icons.error, color: Colors.red),
-                  ),
+                  placeholder:
+                      (context, url) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.pets, color: Colors.grey),
+                      ),
+                  errorWidget:
+                      (context, url, error) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.error, color: Colors.red),
+                      ),
                 ),
               ),
             ),
@@ -189,7 +191,7 @@ class LikedCatsPage extends StatelessWidget {
                 child: Column(
                   children: [
                     SizedBox(
-                      width: 56,  // Fixed width
+                      width: 56, // Fixed width
                       height: 56, // Fixed height
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
@@ -198,14 +200,22 @@ class LikedCatsPage extends StatelessWidget {
                           fit: BoxFit.cover,
                           width: 56,
                           height: 56,
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.pets, color: Colors.grey),
-                          ),
-                          errorWidget: (context, url, error) => Container(
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.error, color: Colors.red),
-                          ),
+                          placeholder:
+                              (context, url) => Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.pets,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                          errorWidget:
+                              (context, url, error) => Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                ),
+                              ),
                         ),
                       ),
                     ),

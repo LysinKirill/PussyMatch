@@ -9,7 +9,6 @@ abstract class CatLocalDataSource {
   Future<void> unlikeCat(String id);
 }
 
-
 class CatLocalDataSourceImpl implements CatLocalDataSource {
   final Database database;
 
@@ -56,10 +55,6 @@ class CatLocalDataSourceImpl implements CatLocalDataSource {
 
   @override
   Future<void> unlikeCat(String id) async {
-    await database.delete(
-      'liked_cats',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await database.delete('liked_cats', where: 'id = ?', whereArgs: [id]);
   }
 }

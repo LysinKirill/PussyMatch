@@ -8,7 +8,7 @@ class Cat {
     required this.id,
     required this.url,
     required this.breed,
-    DateTime? likedTimestamp
+    DateTime? likedTimestamp,
   }) : likedTimestamp = likedTimestamp ?? DateTime.now();
 
   factory Cat.fromJson(Map<String, dynamic> json) {

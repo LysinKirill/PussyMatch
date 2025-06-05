@@ -28,7 +28,7 @@ class ActionButtons extends StatelessWidget {
             icon: const Icon(Icons.thumb_down, size: 40, color: Colors.red),
             onPressed: () async {
               controller.swipe(CardSwiperDirection.left);
-                context.read<CatListBloc>().add(const CatSwiped());
+              context.read<CatListBloc>().add(const CatSwiped());
             },
           ),
           const SizedBox(width: 40),

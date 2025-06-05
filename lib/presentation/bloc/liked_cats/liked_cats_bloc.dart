@@ -25,9 +25,9 @@ class LikedCatsBloc extends Bloc<LikedCatsEvent, LikedCatsState> {
   }
 
   Future<void> _onLoadLikedCats(
-      LoadLikedCats event,
-      Emitter<LikedCatsState> emit,
-      ) async {
+    LoadLikedCats event,
+    Emitter<LikedCatsState> emit,
+  ) async {
     emit(LikedCatsLoading());
     try {
       final cats = await getLikedCats();
@@ -38,47 +38,50 @@ class LikedCatsBloc extends Bloc<LikedCatsEvent, LikedCatsState> {
   }
 
   Future<void> _onAddLikedCat(
-      AddLikedCat event,
-      Emitter<LikedCatsState> emit,
-      ) async {
+    AddLikedCat event,
+    Emitter<LikedCatsState> emit,
+  ) async {
     await likeCat(event.cat);
     if (state is LikedCatsLoaded) {
       final currentState = state as LikedCatsLoaded;
-      emit(LikedCatsLoaded(
-        cats: [...currentState.cats, event.cat],
-        filteredBreedId: currentState.filteredBreedId,
-      ));
+      emit(
+        LikedCatsLoaded(
+          cats: [...currentState.cats, event.cat],
+          filteredBreedId: currentState.filteredBreedId,
+        ),
+      );
     }
   }
 
   Future<void> _onRemoveLikedCat(
-      RemoveLikedCat event,
-      Emitter<LikedCatsState> emit,
-      ) async {
+    RemoveLikedCat event,
+    Emitter<LikedCatsState> emit,
+  ) async {
     await unlikeCat(event.catId);
     if (state is LikedCatsLoaded) {
       final currentState = state as LikedCatsLoaded;
-      emit(LikedCatsLoaded(
-        cats: currentState.cats.where((cat) => cat.id != event.catId).toList(),
-        filteredBreedId: currentState.filteredBreedId,
-      ));
+      emit(
+        LikedCatsLoaded(
+          cats:
+              currentState.cats.where((cat) => cat.id != event.catId).toList(),
+          filteredBreedId: currentState.filteredBreedId,
+        ),
+      );
     }
   }
 
   Future<void> _onFilterLikedCatsByBreed(
-      FilterLikedCatsByBreed event,
-      Emitter<LikedCatsState> emit,
-      ) async {
+    FilterLikedCatsByBreed event,
+    Emitter<LikedCatsState> emit,
+  ) async {
     if (state is LikedCatsLoaded) {
       final cats = await getLikedCats();
-      final filteredCats = event.breedId == null
-          ? cats
-          : cats.where((cat) => cat.breed.id == event.breedId).toList();
+      final filteredCats =
+          event.breedId == null
+              ? cats
+              : cats.where((cat) => cat.breed.id == event.breedId).toList();
 
-      emit(LikedCatsLoaded(
-        cats: filteredCats,
-        filteredBreedId: event.breedId,
-      ));
+      emit(LikedCatsLoaded(cats: filteredCats, filteredBreedId: event.breedId));
     }
   }
 }

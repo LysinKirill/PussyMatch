@@ -29,7 +29,6 @@ Future<Database> _initDatabase() async {
   return await DatabaseHelper.initializeDatabase(path);
 }
 
-
 Future<void> init() async {
   sl.registerLazySingleton(() => Connectivity());
   sl.registerLazySingleton(() => NetworkBloc(connectivity: sl()));
@@ -50,22 +49,21 @@ Future<void> init() async {
   //! Data Sources
   sl.registerLazySingleton(() => DefaultCacheManager());
   sl.registerLazySingleton<CatRemoteDataSource>(
-        () =>
-        CatRemoteDataSource(
-            client: sl(),
-            baseUrl: 'https://api.thecatapi.com/v1',
-            apiKey: dotenv.env['CAT_API_KEY']!,
-            cacheManager: sl()
-        ),
+    () => CatRemoteDataSource(
+      client: sl(),
+      baseUrl: 'https://api.thecatapi.com/v1',
+      apiKey: dotenv.env['CAT_API_KEY']!,
+      cacheManager: sl(),
+    ),
   );
 
   sl.registerLazySingleton<CatLocalDataSource>(
-        () => CatLocalDataSourceImpl(database: sl()),
+    () => CatLocalDataSourceImpl(database: sl()),
   );
 
   //! Repositories
   sl.registerLazySingleton<CatRepository>(
-        () => CatRepositoryImpl(
+    () => CatRepositoryImpl(
       remoteDataSource: sl(),
       localDataSource: sl(), // Add this
     ),
@@ -73,18 +71,9 @@ Future<void> init() async {
 
   //! Use Cases
 
-
   //! Blocs
-  sl.registerFactory(
-        () => CatListBloc(
-      getCats: sl(),
-    ),
-  );
+  sl.registerFactory(() => CatListBloc(getCats: sl()));
   sl.registerSingleton<LikedCatsBloc>(
-    LikedCatsBloc(
-      getLikedCats: sl(),
-      likeCat: sl(),
-      unlikeCat: sl(),
-    ),
+    LikedCatsBloc(getLikedCats: sl(), likeCat: sl(), unlikeCat: sl()),
   );
 }

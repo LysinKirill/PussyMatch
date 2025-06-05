@@ -8,7 +8,10 @@ class CatRepositoryImpl implements CatRepository {
   final CatRemoteDataSource remoteDataSource;
   final CatLocalDataSource localDataSource;
 
-  CatRepositoryImpl({required this.remoteDataSource, required this.localDataSource});
+  CatRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+  });
 
   @override
   Future<List<Cat>> getRandomCats(int limit) async {
@@ -19,7 +22,8 @@ class CatRepositoryImpl implements CatRepository {
       return cats;
     } catch (e) {
       final cached = await localDataSource.getCachedCats();
-      if (cached.isNotEmpty) return cached.map((model) => model.toEntity()).toList();
+      if (cached.isNotEmpty)
+        return cached.map((model) => model.toEntity()).toList();
       return [];
     }
   }

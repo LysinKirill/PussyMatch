@@ -16,9 +16,9 @@ class CatListBloc extends Bloc<CatListEvent, CatListState> {
   }
 
   Future<void> _onLoadRandomCats(
-      LoadRandomCats event,
-      Emitter<CatListState> emit,
-      ) async {
+    LoadRandomCats event,
+    Emitter<CatListState> emit,
+  ) async {
     emit(CatListLoading());
     try {
       final cats = await getCats(limit: event.limit);
