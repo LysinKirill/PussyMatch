@@ -22,8 +22,9 @@ class CatRepositoryImpl implements CatRepository {
       return cats;
     } catch (e) {
       final cached = await localDataSource.getCachedCats();
-      if (cached.isNotEmpty)
+      if (cached.isNotEmpty) {
         return cached.map((model) => model.toEntity()).toList();
+      }
       return [];
     }
   }
