@@ -31,7 +31,7 @@ class LikedCatsBloc extends Bloc<LikedCatsEvent, LikedCatsState> {
     emit(LikedCatsLoading());
     try {
       final cats = await getLikedCats();
-      emit(LikedCatsLoaded(cats: cats));
+      emit(LikedCatsLoaded(cats: cats, filteredBreedId: null));
     } catch (e) {
       emit(LikedCatsError(message: e.toString()));
     }
