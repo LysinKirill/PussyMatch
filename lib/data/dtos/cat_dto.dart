@@ -3,11 +3,7 @@ class CatDto {
   final String url;
   final List<Map<String, dynamic>> breeds;
 
-  CatDto({
-    required this.id,
-    required this.url,
-    required this.breeds,
-  });
+  CatDto({required this.id, required this.url, required this.breeds});
 
   factory CatDto.fromJson(Map<String, dynamic> json) {
     return CatDto(

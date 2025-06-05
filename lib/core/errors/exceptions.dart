@@ -6,11 +6,9 @@ class AppException implements Exception {
 }
 
 class ServerException extends AppException {
-  ServerException({required String message, StackTrace? stackTrace})
-      : super(message: message, stackTrace: stackTrace);
+  ServerException({required super.message, super.stackTrace});
 }
 
 class NetworkException extends AppException {
-  NetworkException({required String message, StackTrace? stackTrace})
-      : super(message: message, stackTrace: stackTrace);
+  NetworkException({required super.message, super.stackTrace});
 }

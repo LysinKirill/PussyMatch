@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -33,9 +34,9 @@ class LikedCatsPage extends StatelessWidget {
         body: BlocConsumer<LikedCatsBloc, LikedCatsState>(
           listener: (context, state) {
             if (state is LikedCatsError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(state.message)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
             }
           },
           builder: (context, state) {
@@ -60,6 +61,7 @@ class LikedCatsPage extends StatelessWidget {
 
     return ListView.builder(
       itemCount: cats.length,
+      itemExtent: 72,
       itemBuilder: (context, index) {
         final cat = cats[index];
         return Dismissible(
@@ -74,39 +76,51 @@ class LikedCatsPage extends StatelessWidget {
           confirmDismiss: (direction) async {
             return await showDialog(
               context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Confirm'),
-                content: Text('Remove ${cat.breed.name} from favorites?'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('Cancel'),
+              builder:
+                  (context) => AlertDialog(
+                    title: const Text('Confirm'),
+                    content: Text('Remove ${cat.breed.name} from favorites?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: const Text('Remove'),
+                      ),
+                    ],
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text('Remove'),
-                  ),
-                ],
-              ),
             );
           },
           onDismissed: (direction) {
             context.read<LikedCatsBloc>().add(RemoveLikedCat(catId: cat.id));
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Removed ${cat.breed.name}')
-              ),
+              SnackBar(content: Text('Removed ${cat.breed.name}')),
             );
           },
           child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                cat.imageUrl,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(Icons.error),
+            leading: SizedBox(
+              width: 56, // Fixed width
+              height: 56, // Fixed height
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: cat.imageUrl,
+                  fit: BoxFit.cover,
+                  width: 56,
+                  height: 56,
+                  placeholder:
+                      (context, url) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.pets, color: Colors.grey),
+                      ),
+                  errorWidget:
+                      (context, url, error) => Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.error, color: Colors.red),
+                      ),
+                ),
               ),
             ),
             title: Text(cat.breed.name),
@@ -129,28 +143,32 @@ class LikedCatsPage extends StatelessWidget {
   void _confirmDelete(BuildContext context, Cat cat) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Cat'),
-        content: Text('Remove ${cat.breed.name} from favorites?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<LikedCatsBloc>().add(RemoveLikedCat(catId: cat.id));
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Removed ${cat.breed.name}'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Remove Cat'),
+            content: Text('Remove ${cat.breed.name} from favorites?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  context.read<LikedCatsBloc>().add(
+                    RemoveLikedCat(catId: cat.id),
+                  );
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Removed ${cat.breed.name}')),
+                  );
+                },
+                child: const Text(
+                  'Remove',
+                  style: TextStyle(color: Colors.red),
                 ),
-              );
-            },
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -158,31 +176,60 @@ class LikedCatsPage extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: Text(cat.breed.name),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () => _confirmDelete(context, cat),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Image.network(cat.imageUrl),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    cat.breed.description,
-                    style: Theme.of(context).textTheme.bodyLarge,
+        builder:
+            (context) => Scaffold(
+              appBar: AppBar(
+                title: Text(cat.breed.name),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _confirmDelete(context, cat),
                   ),
+                ],
+              ),
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 56, // Fixed width
+                      height: 56, // Fixed height
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: CachedNetworkImage(
+                          imageUrl: cat.imageUrl,
+                          fit: BoxFit.cover,
+                          width: 56,
+                          height: 56,
+                          placeholder:
+                              (context, url) => Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.pets,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                          errorWidget:
+                              (context, url, error) => Container(
+                                color: Colors.grey[200],
+                                child: const Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                ),
+                              ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        cat.breed.description,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
       ),
     );
   }

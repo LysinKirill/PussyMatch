@@ -4,6 +4,8 @@ PussyMatch is a Tinder-like application for finding the perfect cat breed for yo
 
 ## Features ✨
 - Swipe or tap to like/dislike cat images.
+- Likes are saved upon application restart.
+- Loaded cat images are cached and may be revisited in offline mode.
 - View detailed information about each cat breed.
 - Save your favorite cats and view them later.
 - Custom app icons for a polished look.
@@ -11,6 +13,13 @@ PussyMatch is a Tinder-like application for finding the perfect cat breed for yo
 ## Screenshots 📸
 ### Main screen
 ![Main Screen](screenshots/main_page.jpg)
+
+---
+
+### Offline cat list
+(no connection symbol is shown)  
+
+![Offline screen](screenshots/offline_list.jpg)
 
 ---
 ### Details page

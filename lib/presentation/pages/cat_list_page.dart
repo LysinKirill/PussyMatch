@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import '../../core/network/network_bloc.dart';
 import '../../domain/entities/cat.dart';
 import '../bloc/cat_list/cat_list_bloc.dart';
 import '../bloc/liked_cats/liked_cats_bloc.dart';
@@ -19,17 +23,38 @@ class CatListPage extends StatefulWidget {
 
 class _CatListPageState extends State<CatListPage> {
   late final CardSwiperController _controller;
+  StreamSubscription? _networkSubscription;
 
   @override
   void initState() {
     super.initState();
+    _checkNetworkStatus();
     _controller = CardSwiperController();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _networkSubscription?.cancel();
     super.dispose();
+  }
+
+  void _checkNetworkStatus() {
+    final networkBloc = context.read<NetworkBloc>();
+    _networkSubscription = networkBloc.stream.distinct().listen((isConnected) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isConnected
+                ? 'Back online'
+                : 'No internet connection - using cached data',
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    });
   }
 
   @override
@@ -42,11 +67,12 @@ class _CatListPageState extends State<CatListPage> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
-            BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-            )],
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Text(
             'PussyMatch',
@@ -58,9 +84,19 @@ class _CatListPageState extends State<CatListPage> {
           ),
         ),
         actions: [
+          BlocBuilder<NetworkBloc, bool>(
+            builder: (context, isConnected) {
+              return Icon(
+                isConnected ? Icons.wifi : Icons.wifi_off,
+                color: isConnected ? Colors.green : Colors.red,
+              );
+            },
+          ),
+          SizedBox(width: 16),
           BlocBuilder<LikedCatsBloc, LikedCatsState>(
             builder: (context, state) {
-              final likedCount = state is LikedCatsLoaded ? state.cats.length : 0;
+              final likedCount =
+                  state is LikedCatsLoaded ? state.cats.length : 0;
               return Padding(
                 padding: const EdgeInsets.only(right: 20, left: 20),
                 child: GestureDetector(
@@ -68,10 +104,11 @@ class _CatListPageState extends State<CatListPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BlocProvider.value(
-                          value: BlocProvider.of<LikedCatsBloc>(context),
-                          child: const LikedCatsPage(),
-                        ),
+                        builder:
+                            (context) => BlocProvider.value(
+                              value: BlocProvider.of<LikedCatsBloc>(context),
+                              child: const LikedCatsPage(),
+                            ),
                       ),
                     );
                   },
@@ -102,20 +139,27 @@ class _CatListPageState extends State<CatListPage> {
     );
   }
 
-  Widget _buildCatSwiper(BuildContext context, List<Cat> cats, int currentIndex) {
+  Widget _buildCatSwiper(
+    BuildContext context,
+    List<Cat> cats,
+    int currentIndex,
+  ) {
     return Column(
       children: [
         Expanded(
           child: CardSwiper(
             controller: _controller,
             cardsCount: cats.length,
-            cardBuilder: (context, index, _, __) => CatCard(
-              cat: cats[index],
-              onTap: () => _showCatDetails(context, cats[index]),
-            ),
+            cardBuilder:
+                (context, index, _, __) => CatCard(
+                  cat: cats[index],
+                  onTap: () => _showCatDetails(context, cats[index]),
+                ),
             onSwipe: (prevIndex, currentIndex, direction) {
               if (direction == CardSwiperDirection.right) {
-                context.read<LikedCatsBloc>().add(AddLikedCat(cat: cats[prevIndex]));
+                context.read<LikedCatsBloc>().add(
+                  AddLikedCat(cat: cats[prevIndex]),
+                );
               }
               context.read<CatListBloc>().add(const CatSwiped());
               return true;
@@ -135,101 +179,120 @@ class _CatListPageState extends State<CatListPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: Text(cat.breed.name),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () => _confirmDelete(context, cat),
-              ),
-            ],
-          ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AspectRatio(
-                    aspectRatio: 1,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        cat.imageUrl,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        errorBuilder: (_, __, ___) => Container(
-                          color: Colors.grey[200],
-                          child: const Center(child: Icon(Icons.error)),
-                        ),
-                      ),
-                    ),
+        builder:
+            (context) => Scaffold(
+              appBar: AppBar(
+                title: Text(cat.breed.name),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _confirmDelete(context, cat),
                   ),
-                  const SizedBox(height: 20),
-                  _buildDetailCard('Description', cat.breed.description),
-                  const SizedBox(height: 16),
-                  _buildDetailCard('Temperament', cat.breed.temperament),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildDetailCard(
-                          'Life Span',
-                          cat.breed.lifeSpan,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: _buildDetailCard(
-                          'Origin',
-                          cat.breed.origin,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      _buildCategoryTag('Adaptability', cat.breed.adaptability),
-                      _buildCategoryTag('Affection Level', cat.breed.affectionLevel),
-                      _buildCategoryTag('Intelligence', cat.breed.intelligence),
-                      _buildCategoryTag('Energy Level', cat.breed.energyLevel),
-                      _buildCategoryTag('Health Issues', cat.breed.healthIssues),
-                      _buildCategoryTag('Social Needs', cat.breed.socialNeeds),
-                    ],
-                  ),
-                  if (cat.breed.wikipediaUrl.isNotEmpty) ...[
-                    const SizedBox(height: 20),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          launchUrl(Uri.parse(cat.breed.wikipediaUrl));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue[800],
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Open Wikipedia',
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
                 ],
               ),
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 1,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: CachedNetworkImage(
+                            imageUrl: cat.imageUrl,
+                            fit: BoxFit.cover,
+                            placeholder:
+                                (context, url) =>
+                                    Center(child: CircularProgressIndicator()),
+                            errorWidget:
+                                (context, url, error) => Icon(Icons.error),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      _buildDetailCard('Description', cat.breed.description),
+                      const SizedBox(height: 16),
+                      _buildDetailCard('Temperament', cat.breed.temperament),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildDetailCard(
+                              'Life Span',
+                              cat.breed.lifeSpan,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: _buildDetailCard('Origin', cat.breed.origin),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildCategoryTag(
+                            'Adaptability',
+                            cat.breed.adaptability,
+                          ),
+                          _buildCategoryTag(
+                            'Affection Level',
+                            cat.breed.affectionLevel,
+                          ),
+                          _buildCategoryTag(
+                            'Intelligence',
+                            cat.breed.intelligence,
+                          ),
+                          _buildCategoryTag(
+                            'Energy Level',
+                            cat.breed.energyLevel,
+                          ),
+                          _buildCategoryTag(
+                            'Health Issues',
+                            cat.breed.healthIssues,
+                          ),
+                          _buildCategoryTag(
+                            'Social Needs',
+                            cat.breed.socialNeeds,
+                          ),
+                        ],
+                      ),
+                      if (cat.breed.wikipediaUrl.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              launchUrl(Uri.parse(cat.breed.wikipediaUrl));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue[800],
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text(
+                              'Open Wikipedia',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
       ),
     );
   }
@@ -237,34 +300,42 @@ class _CatListPageState extends State<CatListPage> {
   void _confirmDelete(BuildContext context, Cat cat) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Remove Cat'),
-        content: Text('Remove ${cat.breed.name} from favorites?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              context.read<LikedCatsBloc>().add(RemoveLikedCat(catId: cat.id));
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Removed ${cat.breed.name}'),
-                  action: SnackBarAction(
-                    label: 'Undo',
-                    onPressed: () {
-                      context.read<LikedCatsBloc>().add(AddLikedCat(cat: cat));
-                    },
-                  ),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Remove Cat'),
+            content: Text('Remove ${cat.breed.name} from favorites?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  context.read<LikedCatsBloc>().add(
+                    RemoveLikedCat(catId: cat.id),
+                  );
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Removed ${cat.breed.name}'),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {
+                          context.read<LikedCatsBloc>().add(
+                            AddLikedCat(cat: cat),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Remove',
+                  style: TextStyle(color: Colors.red),
                 ),
-              );
-            },
-            child: const Text('Remove', style: TextStyle(color: Colors.red)),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -306,12 +377,9 @@ class _CatListPageState extends State<CatListPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: textColor.withOpacity(0.2),
-          width: 1.5,
-        ),
+        border: Border.all(color: textColor.withValues(alpha: 0.2), width: 1.5),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -348,13 +416,16 @@ class _CatListPageState extends State<CatListPage> {
       case 'Energy Level':
         return ['★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'][score - 1];
       case 'Health Issues':
-        return ['★★★★★', '★★★★☆', '★★★☆☆', '★★☆☆☆', '★☆☆☆☆'][5 - score]; // Inverted
+        return ['★★★★★', '★★★★☆', '★★★☆☆', '★★☆☆☆', '★☆☆☆☆'][5 -
+            score]; // Inverted
       case 'Social Needs':
         return ['★☆☆☆☆', '★★☆☆☆', '★★★☆☆', '★★★★☆', '★★★★★'][score - 1];
       default:
-        return List.filled(score, '★').join() + List.filled(5 - score, '☆').join();
+        return List.filled(score, '★').join() +
+            List.filled(5 - score, '☆').join();
     }
   }
+
   Color _getColorForScore(int score) {
     switch (score) {
       case 1:

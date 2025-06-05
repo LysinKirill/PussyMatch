@@ -7,6 +7,7 @@ import 'package:pussy_match/presentation/bloc/liked_cats/liked_cats_bloc.dart';
 import 'package:pussy_match/presentation/pages/cat_list_page.dart';
 
 import 'core/injection_container.dart';
+import 'core/network/network_bloc.dart';
 
 Future<void> main() async {
   // Ensure Flutter binding is initialized
@@ -28,13 +29,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (context) => GetIt.instance<NetworkBloc>()),
         BlocProvider(
-          create: (context) => GetIt.instance<CatListBloc>()
-            ..add(const LoadRandomCats(limit: 10)),
+          create:
+              (context) =>
+                  GetIt.instance<CatListBloc>()
+                    ..add(const LoadRandomCats(limit: 10)),
         ),
         BlocProvider(
-          create: (context) => GetIt.instance<LikedCatsBloc>()
-            ..add(LoadLikedCats()),
+          create:
+              (context) =>
+                  GetIt.instance<LikedCatsBloc>()..add(LoadLikedCats()),
         ),
       ],
       child: MaterialApp(
@@ -42,10 +47,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
-          appBarTheme: const AppBarTheme(
-            elevation: 0,
-            centerTitle: true,
-          ),
+          appBarTheme: const AppBarTheme(elevation: 0, centerTitle: true),
         ),
         home: const CatListPage(),
         debugShowCheckedModeBanner: false,

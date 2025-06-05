@@ -15,18 +15,12 @@ class CatListLoaded extends CatListState {
   final List<Cat> cats;
   final int currentIndex;
 
-  const CatListLoaded({
-    required this.cats,
-    this.currentIndex = 0,
-  });
+  const CatListLoaded({required this.cats, this.currentIndex = 0});
 
   @override
   List<Object> get props => [cats, currentIndex];
 
-  CatListLoaded copyWith({
-    List<Cat>? cats,
-    int? currentIndex,
-  }) {
+  CatListLoaded copyWith({List<Cat>? cats, int? currentIndex}) {
     return CatListLoaded(
       cats: cats ?? this.cats,
       currentIndex: currentIndex ?? this.currentIndex,

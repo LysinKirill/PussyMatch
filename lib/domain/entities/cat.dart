@@ -1,3 +1,5 @@
+import '../../data/dtos/cat_dto.dart';
+
 class Cat {
   final String id;
   final String imageUrl;
@@ -52,4 +54,34 @@ class CatBreed {
     required this.vocalisation,
     required this.wikipediaUrl,
   });
+}
+
+extension CatDtoX on CatDto {
+  Cat toEntity() {
+    final breedDto = BreedDto.fromJson(breeds.first);
+    return Cat(
+      id: id,
+      imageUrl: url,
+      breed: CatBreed(
+        id: breedDto.id,
+        name: breedDto.name,
+        description: breedDto.description,
+        temperament: breedDto.temperament,
+        origin: breedDto.origin,
+        lifeSpan: breedDto.lifeSpan,
+        weight: breedDto.weight,
+        adaptability: breedDto.adaptability,
+        affectionLevel: breedDto.affectionLevel,
+        childFriendly: breedDto.childFriendly,
+        dogFriendly: breedDto.dogFriendly,
+        energyLevel: breedDto.energyLevel,
+        healthIssues: breedDto.healthIssues,
+        intelligence: breedDto.intelligence,
+        socialNeeds: breedDto.socialNeeds,
+        strangerFriendly: breedDto.strangerFriendly,
+        vocalisation: breedDto.vocalisation,
+        wikipediaUrl: breedDto.wikipediaUrl,
+      ),
+    );
+  }
 }
