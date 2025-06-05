@@ -5,6 +5,7 @@ import '../../domain/entities/cat.dart';
 import '../../domain/repositories/cat_repository.dart';
 import '../datasources/cat_remote_data_source.dart';
 import '../dtos/cat_dto.dart';
+import '../models/cat_model.dart';
 
 class CatRepositoryImpl implements CatRepository {
   final CatRemoteDataSource remoteDataSource;
@@ -17,12 +18,12 @@ class CatRepositoryImpl implements CatRepository {
   Future<List<Cat>> getRandomCats(int limit) async {
     try {
       final catDtos = await remoteDataSource.getRandomCats(limit);
-      final cats = catDtos.map(_mapDtoToEntity).toList();
-      await localDataSource.cacheCats(cats.map((e) => CatDto.fromEntity(e)).toList());
+      final cats = catDtos.map((dto) => dto.toEntity()).toList();
+      await localDataSource.cacheCats(cats.map(CatModel.fromEntity).toList());
       return cats;
     } catch (e) {
       final cached = await localDataSource.getCachedCats();
-      if (cached.isNotEmpty) return cached.map((e) => e.toEntity()).toList();
+      if (cached.isNotEmpty) return cached.map((model) => model.toEntity()).toList();
       throw ServerException(message: 'No cached data available');
     }
   }
